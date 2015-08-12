@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A race to order.">
+  <title>Sequencing Game</title>
+  <link href="main.css" rel="stylesheet">
+</head>
+
+<body align="center" onload="pageLoad()">
+    <div id="left-col">
+      <div id="timerdiv">
+        <p>Your time:</p>
+      </div>
+      <div id="gameoptionsdiv">
+        <span class="block"><button id="lowDimButton" onclick="lowerDimension()">Easier</button>
+        <button id="highDimButton" onclick = "higherDimension()">Harder</button></span>
+        <label class="block optionChecks"><input id="randBoxColours" type="checkbox">Randomize box colours.</label>
+        <label class="block optionChecks"><input id="randFontColours" type="checkbox">Randomize text colours.</label>
+        <label class="block optionChecks"><input id="randFontSizes" type="checkbox">Randomize font size.</label>
+        <label class="block optionChecks"><input id="disappearingBoxes" type="checkbox">Disappearing boxes.</label>
+        <span class="block"><button onclick="reset()">Go!</button></span>
+      </div>
+    </div>
+    <div id="right-col">
+      <div id="gamediv" align="center"></div>
+    </div>
+  </div>
+
+  <script>
+    var buttons = [];
+    var toBeClicked = 1;
+    //Dimension of game grid.  Defaults to 4x4.
+    var gameSize = 4;
+    //In order: box colours, font colours, font sizes and disappearing boxes.
+    var wackySettings = [false, false, false, false];
+    var table;
+    var announcement;
+    var timer;
+
+    function pageLoad() {
+      //create timer.
+      timer = document.createElement("h3");
+      document.getElementById("timerdiv").appendChild(timer);
+      timer.isRunning = false;
+      infiniteLoop();
+
+      //create announcement paragraph.
+      announcement = document.createElement("p");
+      document.getElementById("gamediv").appendChild(announcement);
+
+      newGame();
+    }
+
+    function newGame() {
+      //Reset timer.
+      timer.innerHTML = "0.0";
+      timer.currentTime = 0;
+
+      var arrayOfAwesome = [];
+      for(var i=0; i<=gameSize-1; i++){
+        buttons[i] = [];
+        arrayOfAwesome[i] = [];
+      }
+      //Create table of buttons stored in buttons[][] as Button objects
+      table = document.createElement("table");
+      table.id = "gameTable";
+      for(var i=0; i<=gameSize-1; i++){
+        var row = document.createElement("tr");
+        table.appendChild(row);
+        for(var j=0; j<=gameSize-1; j++){
+          buttons[i][j] = document.createElement("button");
+          var buttonObj = new Button(i, j, buttons[i][j]);
+          row.appendChild(buttons[i][j]);
+        }
+      }
+
+      //Label each button with a unique random number
+      var rand;
+      for(var i=0; i<=gameSize-1; i++){
+        for(var j=0; j<=gameSize-1; j++){
+          do{
+            rand = randomInt();
+            repeat = false;
+            for(var k=0; k<=i; k++){
+              for(var l=0; l<=gameSize-1; l++){
+                if(arrayOfAwesome[k][l] == rand){
+                  repeat = true;
+                }
+              }
+            }
+          }
+          while(repeat);
+          arrayOfAwesome[i][j] = rand;
+        }
+      }      
+
+      for(var i=0; i<=gameSize-1; i++){
+        for(var j=0; j<=gameSize-1; j++){ 
+          buttons[i][j].innerHTML = arrayOfAwesome[i][j];
+        }
+      }
+
+      announcement.innerHTML = "Click the number 1 to start.";
+      document.getElementById("gamediv").appendChild(table);
+
+      applySettings();
+    }
+
+    /* Button object
+    * Parameters: x, y - coordinates of the button in the page table,
+    *             b - html button element
+    */
+    function Button(x, y, b){
+      this.x = x;
+      this.y = y;
+      this.b = b;
+      b.className = "buttonDefault";
+      b.onclick = function buttonClick(){
+        if(b.innerHTML == 1){
+          timer.isRunning = true;
+        }
+        if(b.innerHTML == toBeClicked){
+          if(wackySettings[3]){
+            b.className += " invisibleButton";
+          }
+          else{
+            b.className += " invisibleText";
+          }
+          toBeClicked++;
+          if(toBeClicked == (gameSize*gameSize) + 1){
+            win();
+          }
+          else{
+            announcement.innerHTML = "Next number: " + toBeClicked;
+          }
+        }
+      };
+    }
+
+    function randomInt() {
+      var min = 1;
+      var max = buttons.length * buttons[0].length;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function randomIntWithMax(max) {
+      var min = 1;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function win(){
+      announcement.innerHTML = "You win!  Your time was " + timer.innerHTML + " seconds.";
+      table.parentNode.removeChild(table);
+      timer.isRunning = false;
+      table = document.createElement("button");
+      table.innerHTML = "Reset";
+      table.id = "resetButton";
+      table.onclick = function callReset() {reset();};
+      document.getElementById("gamediv").appendChild(table);
+    }
+
+    function reset(){
+      table.parentNode.removeChild(table);
+      buttons = [];
+      toBeClicked = 1;
+      timer.isRunning = false;
+      saveSettings();
+      newGame();
+    }
+
+    function lowerDimension(){
+      changeDims(gameSize-1);
+      if(gameSize == 2){
+        document.getElementById("lowDimButton").disabled = true;
+      }
+      document.getElementById("highDimButton").disabled = false;
+    }
+
+    function higherDimension(){
+      changeDims(gameSize+1);
+      if(gameSize == 8){
+        document.getElementById("highDimButton").disabled = true;
+      }
+      document.getElementById("lowDimButton").disabled = false;
+    }
+
+    function changeDims(dim){
+      gameSize = dim;
+      reset();
+    }
+
+    function saveSettings() {
+      var temp1 = document.getElementById("randBoxColours").checked;
+      var temp2 = document.getElementById("randFontColours").checked;
+      var temp3 = document.getElementById("randFontSizes").checked;
+      var temp4 = document.getElementById("disappearingBoxes").checked;
+      wackySettings = [temp1, temp2, temp3, temp4];
+      console.log(wackySettings[0]);
+    }
+
+    function applySettings() {
+      if(wackySettings[0]) {
+        makeTheBoxesRandom();
+      }
+      if(wackySettings[1]) {
+        makeTheColoursRandom();
+      }
+      if(wackySettings[2]) {
+        makeTheFontsRandom();
+      }
+      //The last wacky setting is taken care of in the Button.onclick function, since it has to do with the running program rather than setup.
+    }
+
+    function makeTheBoxesRandom() {
+      for(var i=0; i<=gameSize-1; i++){
+        for(var j=0; j<=gameSize-1; j++){
+          buttons[i][j].className += " backcolor" + randomIntWithMax(4);
+        }
+      }
+    }
+
+    function makeTheColoursRandom() {
+      for(var i=0; i<=gameSize-1; i++){
+        for(var j=0; j<=gameSize-1; j++){ 
+          buttons[i][j].className += " color" + randomIntWithMax(4);
+        }
+      }
+    }
+
+    function makeTheFontsRandom() {
+      for(var i=0; i<=gameSize-1; i++){
+        for(var j=0; j<=gameSize-1; j++){ 
+          buttons[i][j].className += " size" + randomIntWithMax(4);
+        }
+      }
+    }
+
+
+    //Timer
+    function infiniteLoop(){
+      ticker = setInterval(function() {update()},100);
+    }
+
+    function update(){
+      if(timer.isRunning){
+        timer.currentTime+= 1;
+        timer.innerHTML = (Math.floor(timer.currentTime) / 10).toFixed(1);
+      }
+    }
+
+  </script>
+</body>
+</html>

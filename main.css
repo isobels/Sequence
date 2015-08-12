@@ -1,0 +1,108 @@
+#left-col{
+  display: inline-block;
+  width: 30%;
+  max-width: 210px;
+  margin: 10px;
+}
+
+#right-col{
+  width: 70%;
+  max-width: 600px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#gameoptionsdiv{
+  vertical-align: middle;
+  padding: 7px;
+  border: 2px solid #bbb;
+  border-radius: 7px;
+}
+
+.optionChecks{
+  text-align: left;
+}
+
+#timerdiv{
+  margin: 12px;
+  margin-bottom: 30px;
+}
+
+#timerdiv h3{
+  font-size: 3em;
+  margin: 15px;
+}
+
+#gamediv{
+  margin: 10px 0px;
+}
+
+#gameTable button{
+  width: 50px;
+  height: 50px;
+  margin: 10px;
+}
+
+#resetButton{
+  width: 100px;
+  height: 50px;
+  font-size: 1.3em;
+}
+
+/*For wacky game settings only*/
+
+.invisibleText{
+  color: transparent !important;
+}
+
+.invisibleButton{
+  visibility: hidden;
+}
+
+.size1{
+  font-size: .6em;
+}
+
+.size2{
+  font-size: .8em;
+}
+
+.size3{
+  font-size: 1em;
+}
+
+.size4{
+  font-size: 1.2em;
+}
+
+.color1{
+  color: royalblue;
+}
+
+.color2{
+  color: red;
+}
+
+.color3{
+  color: green;
+}
+
+.color4{
+  color: purple;
+}
+
+.backcolor1, .backcolor1:hover{
+  background-color: yellow;
+}
+
+.backcolor2, .backcolor2:hover{
+  background-color: fuchsia;
+}
+
+.backcolor3, .backcolor3:hover{
+  background-color: cyan;
+}
+
+.backcolor4, .backcolor4:hover{
+  background-color: orange;
+}
